@@ -9,12 +9,14 @@ try
    brick = ConnectBrick('Senchariot');
 catch exception
    disp('Brick already connected. ');
+   disp(exception.message);
 end
 
 try 
     brick.SetColorMode(1, 2);
 catch exception
     disp('Brick already in color mode 2.')
+    disp(exception.message);
 end
 
 
@@ -23,6 +25,11 @@ redCount = 0;
 
 while 1
     pause(0.05);
+
+    if (brick == null)
+        continue;
+    end
+
     UpdateAndPrintValues(brick);
 
     % 0 == unknown color
@@ -36,24 +43,11 @@ while 1
     switch color
         case 2
             disp('Detected blue');
-
-            beep(50, 500);
-            pause (0.5);
-
-            beep(50, 500);
-            pause (0.5);
+            playTwoTones(brick);
 
         case 3
             disp('Detected green');
-
-            beep(50, 500);
-            pause (0.5);
-
-            beep(50, 500);
-            pause (0.5);
-
-            beep(50, 500);
-            pause (0.5);
+            brick.playThreeTones();
 
         case 5
             disp('Detected red.');
@@ -99,6 +93,11 @@ end
 
 % Updates global values and prints them too
 function UpdateAndPrintValues(brick)
+    if (brick == null)
+        disp('Brick is null');
+        return;
+    end
+
     distance = brick.UltrasonicDist(2);
     disp('Distance (in cm): ' + distance);
 
@@ -108,6 +107,11 @@ end
 
 % Turns car 90 degrees to the left with the relative angle
 function Turn90Left(brick)
+    if (brick == null)
+        disp('Brick is null');
+        return;
+    end
+
     brick.MoveMotorAngleRel('A', 50, -90, 'Brake');
     brick.MoveMotorAngleRel('B', 50, 90, 'Brake');
     
@@ -117,6 +121,11 @@ end
 
 % Turns car 90 degrees to the right with the relative angle
 function Turn90Right(brick)
+    if (brick == null)
+        disp('Brick is null');
+        return;
+    end
+
     brick.MoveMotorAngleRel('A', 50, 90, 'Brake');
     brick.MoveMotorAngleRel('B', 50, -90, 'Brake');
     
@@ -126,6 +135,11 @@ end
 
 % Old turn left function. do not use
 function TurnLeft(brick)
+    if (brick == null)
+        disp('Brick is null');
+        return;
+    end
+
     brick.MoveMotor('B', 18);
     brick.MoveMotor('A', -18);
     pause(0.5);
@@ -136,11 +150,38 @@ end
 
 % Old turn right function. do not use
 function TurnRight(brick)
+    if (brick == null)
+        disp('Brick is null');
+        return;
+    end
+
     brick.MoveMotor('B', -18);
     brick.MoveMotor('A', 18);
     pause(0.5);
     brick.StopAllMotors('Coast');
 end
 
+% Ripped from the Brick.m file in the EV3 Toolbox and removed two lines.
+% Should theoretically play two tones
+function playTwoTones(brick) 
+    % Brick.playTwoTones Play two tones on the brick
+    %
+    % Brick.playTwoTones() plays two tones consequentively on
+    % the brick with one upload command.
+    %
+    % Example::
+    %           b.playThreeTones();
+    
+    cmd = Command();
+    cmd.addHeaderDirect(42,0,0);
+    cmd.opSOUND_TONE(5,440,500);
+    cmd.opSOUND_READY();
+    cmd.opSOUND_TONE(10,880,500);
+    cmd.opSOUND_READY();
+    cmd.addLength();
+    % print message
+    fprintf('Sending two tone message ...\n');
+    brick.send(cmd);    
+end
 
 brick.StopAllMotors('Coast'); % Tries to stop the motors but execution never reaches here.
