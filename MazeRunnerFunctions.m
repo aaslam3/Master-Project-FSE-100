@@ -1,5 +1,6 @@
 classdef MazeRunnerFunctions
     methods(Static)
+        
         function makeSound(brick)
             brick.playTone(100, 440, 700);
         end

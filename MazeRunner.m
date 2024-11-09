@@ -22,6 +22,8 @@ greenCount = 0;
 dropOffPointReached = false;
 
 while true
+    pause(0.05);
+
     switch key
         case 'q'
             brick.MoveMotor('AB', 0);
@@ -38,7 +40,6 @@ while true
             disp('Drop off point set false manually.');
     end
 
-    pause(0.05);
 
     % fprintf('\nRed color counter : %f\n', redLineCount);
     % fprintf('Blue color counter : %f\n', blueCount);
