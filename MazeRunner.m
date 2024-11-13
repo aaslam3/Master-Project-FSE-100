@@ -1,5 +1,28 @@
 %#ok<*GVMIS>
 
+
+
+global key;
+
+InitKeyboard();
+
+% brick = 0;
+% distance = 0;
+% color = 0;
+
+distanceThreshold = 15;
+% if distance is less than this value, then we decide to move left or right
+% in the autoControl function. leave it at 15 unless experimenting.
+
+distanceOffset = 30; % this value should be heavily tested and verified it works.
+% if there isnt a wall distanceThreshold + distanceOffset cm away, 
+% we know that that turn is also navigable. the offset is here to 
+% resolve the case where it detects a wall but its less than our
+% threshold which needs the car to be very close to the wall.
+% essentially im extending the threshold.
+
+manualControlPointReached = false;
+
 % 0 == unknown color
 % 1 == black
 % 2 == blue
@@ -9,17 +32,21 @@
 % 6 == white
 % 7 == brown
 
-global key;
+firstColorDetected = 3; % green
+% this is the starting color
 
-InitKeyboard();
+manualControlPoint = 4; % yellow. 
+% should be changed for what is given by the prof. 
+% this is the color where we switch to manual control
 
-% brick = 0;
-% distance = 0;
-% color = 0;
-redLineCount = 0;
-blueCount = 0;
-greenCount = 0;
-dropOffPointReached = false;
+targetDropOffColor = 2; % blue
+% should be changed for what is given by the prof. 
+% this is the color we have to reach after turning off manual control
+
+passengerPickedUp = false;
+% this is a flag to check if we passed pick up point and picked up
+% passenger. useful for if we reach the drop off point without picking up
+% passenger.
 
 while true
     pause(0.05);
@@ -32,34 +59,34 @@ while true
             break;
 
         case 'i'
-            dropOffPointReached = true;
+            manualControlPointReached = true;
             disp('Drop off point set true manually.');
 
         case 'o'
-            dropOffPointReached = false;
+            manualControlPointReached = false;
             disp('Drop off point set false manually.');
     end
 
-
-    % fprintf('\nRed color counter : %f\n', redLineCount);
-    % fprintf('Blue color counter : %f\n', blueCount);
-    % fprintf('Green color counter : %f\n', greenCount);
-    fprintf('Drop off point : %d\n', dropOffPointReached);
+    % fprintf('Drop off point : %d\n', dropOffPointReached);
 
     brick.SetColorMode(1, 2);
 
     distance = brick.UltrasonicDist(2);
-    fprintf('Distance : %.f\n', distance);
+    % fprintf('Distance : %.f\n', distance);
 
     color = brick.ColorCode(1);
-    fprintf('Color : %.f\n', color);
+    % fprintf('Color : %.f\n', color);
 
 
-    if (dropOffPointReached == true)
-        dropOffPointReached = MazeRunnerFunctions.manualControl(brick);
+    if (manualControlPointReached == true)
+        % manual keyboard control
+        [manualControlPointReached, passengerPickedUp] = MazeRunnerFunctions.manualControl(brick, key);
+        continue;
 
     else
-        [dropOffPointReached, blueCount, greenCount, redLineCount] = MazeRunnerFunctions.autoControl(brick, distance, blueCount, greenCount, redLineCount);
+        % auto control
+        manualControlPointReached = MazeRunnerFunctions.autoControl(brick, distance, color, firstColorDetected, manualControlPoint, targetDropOffColor, distanceThreshold, distanceOffset);
+        continue;
     end
 
 
