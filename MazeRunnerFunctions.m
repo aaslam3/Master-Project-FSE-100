@@ -4,35 +4,49 @@ classdef MazeRunnerFunctions
     methods(Static)
 
         function makeSound(brick)
+            
             brick.playTone(100, 440, 700);
         end
 
         function turnRight(brick)
-            brick.MoveMotor('A', -50);
-            brick.MoveMotor('B', 50);
-            pause(0.4);
+            disp('turning right');
+            brick.MoveMotor('A', -25);
+            brick.MoveMotor('B', 25);
+            pause(1.7);
+            brick.MoveMotor('AB', 0);
         end
 
         function turnLeft(brick)
-            brick.MoveMotor('A', 50);
-            brick.MoveMotor('B', -50);
-            pause(0.4);
+            disp('turning left');
+            brick.MoveMotor('A', 25);
+            brick.MoveMotor('B', -25);
+            pause(1.7);
+            brick.MoveMotor('AB', 0);
         end
 
         function turnAround(brick)
+            
             brick.MoveMotor('AB', 0);
 
             pause(1);
-            brick.MoveMotor('A', 100); % turn around 180 degrees
-            brick.MoveMotor('B', -100);
-    
-            pause(1);
+            disp('turning around');
+            MazeRunnerFunctions.turnLeft(brick);
+            pause(3);
+            MazeRunnerFunctions.turnLeft(brick);
+
             brick.MoveMotor('AB', 0); % and stop
+            pause(1);
         end
 
-        function StopForColorsAndBeep(brick, color)
+        function StopForColorsAndBeep(brick, color, firstColorDetected)
+            
+            if (firstColorDetected == color)
+                return
+            end
+
             switch color
                 case 2
+                    
                     MazeRunnerFunctions.BlueFunctionality(brick);
 
                 case 3
@@ -46,15 +60,16 @@ classdef MazeRunnerFunctions
             end
         end
 
-        function [manualControlPointReached, passengerPickedUp] = manualControl(brick, key)
+        function [manualControlPointReached, passengerPickedUpReturn] = manualControl(brick, key, fineControl)
+            
             disp('In Manual control');
             manualControlPointReached = true;
-            passengerPickedUp = false;
+            passengerPickedUpReturn = false;
 
             switch key
                 case 'p' % resume auto mode
                     manualControlPointReached = false;
-                    passengerPickedUp = true;
+                    passengerPickedUpReturn = true;
                     disp('Drop off point reached false');
 
                 case 'w' % open grabber
@@ -67,23 +82,47 @@ classdef MazeRunnerFunctions
 
 
                 case 'leftarrow'
-                    brick.MoveMotor('A', 50);
-                    brick.MoveMotor('B', -50);
+                    if (fineControl)
+                        brick.MoveMotor('A', 5);
+                        brick.MoveMotor('B', -5);
+                    else
+                        brick.MoveMotor('A', 50);
+                        brick.MoveMotor('B', -50);
+                    end
+                    
                     disp('move left');
 
                 case 'rightarrow'
-                    brick.MoveMotor('A', -50);
-                    brick.MoveMotor('B', 50);
+                    if (fineControl)
+                        brick.MoveMotor('A', -5);
+                        brick.MoveMotor('B', 5);
+                    else
+                        brick.MoveMotor('A', -50);
+                        brick.MoveMotor('B', 50);
+                    end
+                    
                     disp('move right');
 
                 case 'uparrow'
-                    brick.MoveMotor('A', -100);
-                    brick.MoveMotor('B', -100);
+                    if (fineControl)
+                        brick.MoveMotor('A', -10);
+                        brick.MoveMotor('B', -10);
+                    else
+                        brick.MoveMotor('A', -100);
+                        brick.MoveMotor('B', -100);
+                    end
+                    
                     disp('move up');
 
                 case 'downarrow'
-                    brick.MoveMotor('A', 100);
-                    brick.MoveMotor('B', 100);
+                    if (fineControl)
+                        brick.MoveMotor('A', 10);
+                        brick.MoveMotor('B', 10);
+                    else
+                        brick.MoveMotor('A', 100);
+                        brick.MoveMotor('B', 100);
+                    end
+                    
                     disp('move down');
 
                 case 0
@@ -104,6 +143,7 @@ classdef MazeRunnerFunctions
         % see which way is open.
 
         function [manualControlPointReachedReturn] = autoControl(brick, distance, color, firstColorDetected, manualControlPoint, targetDropOffColor, distanceThreshold, distanceOffset, passengerPickedUp)
+            
             if (color == targetDropOffColor && passengerPickedUp == true)
                 disp('!!! AT DROPOFF POINT WITH PASSENGER !!!    Press q to quit program or move car manually.');
                 pause(0.2);
@@ -112,7 +152,7 @@ classdef MazeRunnerFunctions
 
 
             brick.MoveMotor('AB', -100);
-            disp('In Auto control');
+            % disp('In Auto control');
 
 
             % these are here to satisfy errors. do not change
@@ -120,12 +160,12 @@ classdef MazeRunnerFunctions
             whichWayToTurn = WaysToTurn.None;
 
 
-            MazeRunnerFunctions.StopForColorsAndBeep(brick, color);
+            MazeRunnerFunctions.StopForColorsAndBeep(brick, color, firstColorDetected);
 
 
             if (color == manualControlPoint)
                 % if at manual control point, set variable to true and return function
-                manualControlPointReachedReturn = manualControlPointReached(brick);
+                manualControlPointReachedReturn = MazeRunnerFunctions.manualControlPointReached(brick);
                 return;
             end
 
@@ -138,7 +178,7 @@ classdef MazeRunnerFunctions
                 pause(0.5); % this value may need tweaking as the car can still be on the drop off color or go too far.
 
                 % get an updated value for color
-                whichWayToTurn = CheckLeftAndRight(brick, distanceThreshold, distanceOffset);
+                whichWayToTurn = MazeRunnerFunctions.CheckLeftAndRight(brick, distanceThreshold, distanceOffset);
 
                 MazeRunnerFunctions.TurningFunctionality(brick, whichWayToTurn);
 
@@ -149,7 +189,8 @@ classdef MazeRunnerFunctions
             % if we detect a wall in front of us, we turn both ways to see
             % where to go next.
             if (distance < distanceThreshold)
-                whichWayToTurn = CheckLeftAndRight(brick, distanceThreshold, distanceOffset);
+                disp('Wall detected. running left and right code.');
+                whichWayToTurn = MazeRunnerFunctions.CheckLeftAndRight(brick, distanceThreshold, distanceOffset);
 
                 MazeRunnerFunctions.TurningFunctionality(brick, whichWayToTurn);
             end
@@ -158,6 +199,7 @@ classdef MazeRunnerFunctions
 
 
         function TurningFunctionality(brick, whichWayToTurn)
+            
             switch whichWayToTurn
                     case WaysToTurn.Any
                         % NOTE: % in practice should never come here. if 
@@ -168,7 +210,7 @@ classdef MazeRunnerFunctions
                         pause(1);
 
                         % if we can turn any way, turn left. we need it to
-                        % be left when we have to go from yellow to blue.
+                        % be left because it helps us is many cases.
                         MazeRunnerFunctions.turnLeft(brick);
                         brick.MoveMotor('AB', -100); % start moving forward
 
@@ -191,6 +233,7 @@ classdef MazeRunnerFunctions
                         % the only place this will happen is at blue but it
                         % will most likely be the drop off point.
                         disp('Dead end detected. Turning back.');
+                        % MazeRunnerFunctions.turnLeft(brick);
                         MazeRunnerFunctions.turnAround(brick);
                         brick.MoveMotor('AB', -100); % start moving forward
 
@@ -202,27 +245,40 @@ classdef MazeRunnerFunctions
         % when distance is less than 15, the car looks left and right to
         % see which way is open.
         function [ whichWayToTurn ] = CheckLeftAndRight(brick, distanceThreshold, distanceOffset)
+            
             leftTurnAvailable = false;
             rightTurnAvailable = false; % ik i need help naming variables, leave me alone
             tempDistance = 0;
 
 
             % turn brick left first to see if there is a wall there.
+            disp('Turning Left. CheckLeftAndRight')
             MazeRunnerFunctions.turnLeft(brick);
-            pause(1);
+            pause(3);
 
+            
             tempDistance = brick.UltrasonicDist(2);
-            if (tempDistance < distanceThreshold + distanceOffset)
+            fprintf('Left Distance : %.f\n', tempDistance);
+
+            if (tempDistance > (distanceThreshold + distanceOffset))
+                disp('left turn available. CheckLeftAndRight');
                 leftTurnAvailable = true;
             end
 
 
             % turn brick around to see if there is a wall there.
-            MazeRunnerFunctions.turnAround(brick);
+            MazeRunnerFunctions.turnRight(brick);
             pause(1);
+            MazeRunnerFunctions.turnRight(brick);
+            pause(3);
+
 
             tempDistance = brick.UltrasonicDist(2);
-            if (tempDistance < distanceThreshold + distanceOffset)
+
+            fprintf('Right Distance : %.f\n', tempDistance);
+
+            if (tempDistance > (distanceThreshold + distanceOffset))
+                disp('right turn available. CheckLeftAndRight');
                 rightTurnAvailable = true;
             end
 
@@ -251,8 +307,9 @@ classdef MazeRunnerFunctions
 
             % turn left again to go back to where we were facing before
             % this function started.
+            disp('resetting car to orignal position. CheckLeftAndRight');
             MazeRunnerFunctions.turnLeft(brick);
-            pause(1);
+            pause(0.5);
         end
 
 

@@ -1,4 +1,4 @@
-%#ok<*GVMIS>
+% %#ok<*GVMIS>
 
 
 
@@ -14,7 +14,7 @@ distanceThreshold = 15;
 % if distance is less than this value, then we decide to move left or right
 % in the autoControl function. leave it at 15 unless experimenting.
 
-distanceOffset = 30; % this value should be heavily tested and verified it works.
+distanceOffset = 40; % this value should be heavily tested and verified it works.
 % if there isnt a wall distanceThreshold + distanceOffset cm away, 
 % we know that that turn is also navigable. the offset is here to 
 % resolve the case where it detects a wall but its less than our
@@ -48,15 +48,32 @@ passengerPickedUp = false;
 % passenger. useful for if we reach the drop off point without picking up
 % passenger.
 
+
+fineControl = false;
+% this is a flag that lowers the motor speeds in manual control so that we
+% can use our controls with more precision.
+
 while true
     pause(0.05);
 
+    % fprintf('\n\n');
+
+    % DEBUG PURPOSES ONLY. REMOVE ALL CASES OTHER THAN q AND y BEFORE DEMO 
     switch key
         case 'q'
             brick.MoveMotor('AB', 0);
             brick.MoveMotor('C', 0);
             CloseKeyboard();
             break;
+
+        case 'y'
+            fineControl = ~fineControl;
+            fprintf('Fine control: %d', fineControl);
+            pause(2);
+            % toggles between true and false. it might take a few tries for
+            % us to actually keep it at what we want since our loop is so
+            % fast, it might trigger this multiple times. the pause might
+            % help with this. will have to try.
 
         case 'i'
             manualControlPointReached = true;
@@ -80,12 +97,12 @@ while true
 
     if (manualControlPointReached == true)
         % manual keyboard control
-        [manualControlPointReached, passengerPickedUp] = MazeRunnerFunctions.manualControl(brick, key);
+        [manualControlPointReached, passengerPickedUp] = MazeRunnerFunctions.manualControl(brick, key, fineControl);
         continue;
 
     else
         % auto control
-        manualControlPointReached = MazeRunnerFunctions.autoControl(brick, distance, color, firstColorDetected, manualControlPoint, targetDropOffColor, distanceThreshold, distanceOffset);
+        manualControlPointReached = MazeRunnerFunctions.autoControl(brick, distance, color, firstColorDetected, manualControlPoint, targetDropOffColor, distanceThreshold, distanceOffset, passengerPickedUp);
         continue;
     end
 

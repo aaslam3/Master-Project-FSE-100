@@ -38,7 +38,7 @@ end
 
 
 % Unused function. might need to use it depending on the prof.
-function DoColorStuff(brick, firstColorDetected, manualControlPoint, color)
+function DoColorStuff(brick, firstColorDetected, manualControlPoint, color, passengerPickedUp)
     switch firstColorDetected
         case 2 % blue
     
@@ -47,20 +47,29 @@ function DoColorStuff(brick, firstColorDetected, manualControlPoint, color)
                     % if we start from blue and have to reach green
                     % for manual control. then we switch back to
                     % auto control and go to yellow.
-                    if (color == 4)
-    
+                    if (color == 4 && passengerPickedUp == true)
+
+                    else 
+                        if (color == 4 && passengerPickedUp == false)
+
+                        end
                     end
     
                 case 4 % yellow
                     % if we start from blue and have to reach yellow
                     % for manual control. then we switch back to
                     % auto control and go to green.
-                    if (color == 3)
+                    if (color == 3 && passengerPickedUp == true)
     
+                    else
+                        if (color == 3 && passengerPickedUp == false)
+
+                        end
                     end
     
                 otherwise
                     % default case
+                    return;
             end
     
     
@@ -71,20 +80,29 @@ function DoColorStuff(brick, firstColorDetected, manualControlPoint, color)
                     % if we start from green and have to reach blue
                     % for manual control. then we switch back to
                     % auto control and go to yellow.
-                    if (color == 4)
-    
+                    if (color == 4 && passengerPickedUp == true)
+
+                    else
+                        if (color == 4 && passengerPickedUp == false)
+
+                        end
                     end
     
                 case 4 % yellow
                     % if we start from green and have to reach yellow
                     % for manual control. then we switch back to
                     % auto control and go to blue.
-                    if (color == 2)
-    
+                    if (color == 2 && passengerPickedUp == true)
+                            
+                    else
+                        if (color == 2 && passengerPickedUp == false)
+
+                        end
                     end
     
                 otherwise
                     % default case
+                    return;
             end
     
     
@@ -96,20 +114,32 @@ function DoColorStuff(brick, firstColorDetected, manualControlPoint, color)
                     % if we start from yellow and have to reach blue
                     % for manual control. then we switch back to
                     % auto control and go to green.
-                    if (color == 3)
-    
+                    if (color == 3 && passengerPickedUp == true)
+                            
+                    else
+                        if (color == 3 && passengerPickedUp == false)
+
+                        end
                     end
     
                 case 3 % green
                     % if we start from yellow and have to reach green
                     % for manual control. then we switch back to
                     % auto control and go to blue.
-                    if (color == 2)
-    
+                    if (color == 2 && passengerPickedUp == true)
+                            
+                    else
+                        if (color == 2 && passengerPickedUp == false)
+
+                        end
                     end
     
                 otherwise
                     % default case
+                    return;
             end
+            
+        otherwise
+            return;
     end
 end
