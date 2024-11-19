@@ -1,10 +1,27 @@
-% %#ok<*GVMIS>
+%#ok<*GVMIS>
 
+% A custom implementation of the InitKeyboard function from the EV3
+% Toolbox. It makes it easier to see what the controls are for the car.
+function textbox = InitKeyboardCustom
+    global key
+    global h
+    key = 0;
 
+    text = MazeRunnerFunctions.getText();
+
+    h = figure;
+    set(h, 'KeyPressFcn', @(h_obj, evt) updateKey(evt.Key));
+    set(h, 'KeyReleaseFcn', @(h_obj, evt) clearKey());
+    textbox = annotation(h, 'textbox',[0,0,1,1]);
+
+    set(textbox,'String', text, 'FontSize', 14);
+end
 
 global key;
 
-InitKeyboard();
+textbox = InitKeyboardCustom();
+% this is the handle for the Figure n window that opens up when we run
+% InitKeyboard(). (n being the number of figure).
 
 % brick = 0;
 % distance = 0;
@@ -22,15 +39,6 @@ distanceOffset = 40; % this value should be heavily tested and verified it works
 % essentially im extending the threshold.
 
 manualControlPointReached = false;
-
-% 0 == unknown color
-% 1 == black
-% 2 == blue
-% 3 == green
-% 4 == yellow
-% 5 == red
-% 6 == white
-% 7 == brown
 
 firstColorDetected = 3; % green
 % this is the starting color
@@ -51,37 +59,30 @@ passengerPickedUp = false;
 
 fineControl = false;
 % this is a flag that lowers the motor speeds in manual control so that we
-% can use our controls with more precision.
+% can use our controls with more precision. press y to toggle.
+
+% 0 == unknown color
+% 1 == black
+% 2 == blue
+% 3 == green
+% 4 == yellow
+% 5 == red
+% 6 == white
+% 7 == brown
 
 while true
     pause(0.05);
 
+    MazeRunnerFunctions.updateTextBox(textbox, key);
+
     % fprintf('\n\n');
 
-    % DEBUG PURPOSES ONLY. REMOVE ALL CASES OTHER THAN q AND y BEFORE DEMO 
     switch key
         case 'q'
             brick.MoveMotor('AB', 0);
             brick.MoveMotor('C', 0);
             CloseKeyboard();
             break;
-
-        case 'y'
-            fineControl = ~fineControl;
-            fprintf('Fine control: %d', fineControl);
-            pause(2);
-            % toggles between true and false. it might take a few tries for
-            % us to actually keep it at what we want since our loop is so
-            % fast, it might trigger this multiple times. the pause might
-            % help with this. will have to try.
-
-        case 'i'
-            manualControlPointReached = true;
-            disp('Drop off point set true manually.');
-
-        case 'o'
-            manualControlPointReached = false;
-            disp('Drop off point set false manually.');
     end
 
     % fprintf('Drop off point : %d\n', dropOffPointReached);
@@ -97,7 +98,7 @@ while true
 
     if (manualControlPointReached == true)
         % manual keyboard control
-        [manualControlPointReached, passengerPickedUp] = MazeRunnerFunctions.manualControl(brick, key, fineControl);
+        [manualControlPointReached, passengerPickedUp] = MazeRunnerFunctions.manualControl(brick, textbox, key, fineControl);
         continue;
 
     else

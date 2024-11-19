@@ -3,6 +3,28 @@
 classdef MazeRunnerFunctions
     methods(Static)
 
+        function updateTextBox(textbox, key)
+            text = MazeRunnerFunctions.getText();
+            text(14) = {"Key pressed: "};
+            text(15) = {key};
+            set(textbox, 'String', text); % shows us what key we are pressing.
+        end
+
+        function text = getText()
+            text(1) = {'Q - Quit program (hold for atleast 20 seconds if not working)'};
+
+            text(3) = {'Y - Toggle fine control'};
+            text(4) = {'P - Resume auto mode'};
+
+            text(6) = {'W - Open grabber'};
+            text(7) = {'S - Close grabber'};
+
+            text(9) = {'Up Arrow - Move Forward'};
+            text(10) = {'Right Arrow - Turn Right'};
+            text(11) = {'Left Arrow - Turn Left'};
+            text(12) = {'Down Arrow - Move Backward'};
+        end
+
         function makeSound(brick)
             
             brick.playTone(100, 440, 700);
@@ -46,7 +68,6 @@ classdef MazeRunnerFunctions
 
             switch color
                 case 2
-                    
                     MazeRunnerFunctions.BlueFunctionality(brick);
 
                 case 3
@@ -60,13 +81,24 @@ classdef MazeRunnerFunctions
             end
         end
 
-        function [manualControlPointReached, passengerPickedUpReturn] = manualControl(brick, key, fineControl)
+        function [manualControlPointReached, passengerPickedUpReturn] = manualControl(brick, textbox, key, fineControl)
             
             disp('In Manual control');
             manualControlPointReached = true;
             passengerPickedUpReturn = false;
+            
+            MazeRunnerFunctions.updateTextBox(textbox, key);
 
             switch key
+                case 'y'
+                    fineControl = ~fineControl;
+                    fprintf('Fine control: %d', fineControl);
+                    pause(2);
+                    % toggles between true and false. it might take a few tries for
+                    % us to actually keep it at what we want since our loop is so
+                    % fast, it might trigger this multiple times. the pause might
+                    % help with this. will have to try.
+
                 case 'p' % resume auto mode
                     manualControlPointReached = false;
                     passengerPickedUpReturn = true;
@@ -162,6 +194,24 @@ classdef MazeRunnerFunctions
 
             MazeRunnerFunctions.StopForColorsAndBeep(brick, color, firstColorDetected);
 
+            if (color == 5)
+                disp('red color detected. stopping car ');
+                brick.MoveMotor('AB', 0);
+                pause(1);                        
+                % after stopping at a red line, it should stop here, pause 
+                % for a second and then check left and right and turn 
+                % wherever. the pause value here needs to be tweaked.
+
+                disp('checking left and right');
+                whichWayToTurn = MazeRunnerFunctions.CheckLeftAndRight(brick, distanceThreshold, distanceOffset);
+                pause(1);
+
+                fprintf('turn available: %s\n' + whichWayToTurn);
+                MazeRunnerFunctions.TurningFunctionality(brick, whichWayToTurn);
+
+                return;
+            end
+
 
             if (color == manualControlPoint)
                 % if at manual control point, set variable to true and return function
@@ -202,11 +252,10 @@ classdef MazeRunnerFunctions
             
             switch whichWayToTurn
                     case WaysToTurn.Any
-                        % NOTE: % in practice should never come here. if 
-                        % it is coming here, then something is likely 
-                        % wrong. either it didnt detect the walls correctly 
-                        % or we need to increase our distanceOffset more.
-                        fprintf('\nBoth ways available. \nTurning left just cuz i feel like it. \nyou cant tell me what to do\n\n');
+                        fprintf(['\n\nBoth ways available. \n' ...
+                            'Turning left just cuz i feel like it. \n' ...
+                            'you cant tell me what to do\n\n']);
+                        
                         pause(1);
 
                         % if we can turn any way, turn left. we need it to
@@ -234,6 +283,7 @@ classdef MazeRunnerFunctions
                         % will most likely be the drop off point.
                         disp('Dead end detected. Turning back.');
                         % MazeRunnerFunctions.turnLeft(brick);
+                        
                         MazeRunnerFunctions.turnAround(brick);
                         brick.MoveMotor('AB', -100); % start moving forward
 
@@ -286,23 +336,20 @@ classdef MazeRunnerFunctions
 
             if (rightTurnAvailable == true && leftTurnAvailable == true)
                 % if both turns are navigable
-                whichWayToTurn = WaysToTurn.Any; % in practice, should never occur
+                whichWayToTurn = WaysToTurn.Any;
 
-            else if (rightTurnAvailable == true && leftTurnAvailable == false)
+            elseif (rightTurnAvailable == true && leftTurnAvailable == false)
                 % if right is navigable but not left
                 whichWayToTurn = WaysToTurn.Right;
 
-            else if (rightTurnAvailable == false && leftTurnAvailable == true)
+            elseif (rightTurnAvailable == false && leftTurnAvailable == true)
                 % if left is navigable but not right
                 whichWayToTurn = WaysToTurn.Left;
 
-            else if (rightTurnAvailable == false && leftTurnAvailable == false)
+            elseif (rightTurnAvailable == false && leftTurnAvailable == false)
                 % if neither are navigable
                 whichWayToTurn = WaysToTurn.None;
 
-            end
-            end
-            end
             end
 
             % turn left again to go back to where we were facing before
@@ -321,37 +368,56 @@ classdef MazeRunnerFunctions
 
 
         function RedFunctionality(brick)
+            disp('red color functionality stop');
             brick.MoveMotor('AB', 0); % stop for one second
 
+            disp('red color beep');
             MazeRunnerFunctions.makeSound(brick); % make one beep
             pause(1);
 
+            disp('red color functionality move forward');
             brick.MoveMotor('AB', -100); % keep moving
             pause(1);
         end
 
         function BlueFunctionality(brick)
-            brick.MoveMotor('AB', 0);
+            disp('blue color functionality stop');
+            brick.MoveMotor('AB', 0); % stop for one second
             pause(1);
 
+            % make two beeps
+            disp('blue color beep 1');
+            MazeRunnerFunctions.makeSound(brick);
+            pause(1);
 
+            disp('blue color beep 2');
             MazeRunnerFunctions.makeSound(brick);
             pause(1);
-            MazeRunnerFunctions.makeSound(brick);
-            pause(1);
+
+            % idk if we need to have another line here to make the car go
+            % forward. will need to test this.
         end
 
         function GreenFunctionality(brick)
+            disp('green color functionality stop');
             brick.MoveMotor('AB', 0);
             pause(1);
 
+            % make three beeps
+            disp('green color beep 1');
+            MazeRunnerFunctions.makeSound(brick);
+            pause(1);
 
+            disp('green color beep 2');
             MazeRunnerFunctions.makeSound(brick);
             pause(1);
+
+            disp('green color beep 3');
             MazeRunnerFunctions.makeSound(brick);
             pause(1);
-            MazeRunnerFunctions.makeSound(brick);
-            pause(1);
+
+            % idk if we need to have another line here to make the car go
+            % forward. will need to test this.
         end
     end
 end
