@@ -1,0 +1,1 @@
+brick.MoveMotor('AB', 0);

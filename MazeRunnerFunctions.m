@@ -34,7 +34,7 @@ classdef MazeRunnerFunctions
             disp('turning right');
             brick.MoveMotor('A', -25);
             brick.MoveMotor('B', 25);
-            pause(1.7);
+            pause(1.5);
             brick.MoveMotor('AB', 0);
         end
 
@@ -42,7 +42,7 @@ classdef MazeRunnerFunctions
             disp('turning left');
             brick.MoveMotor('A', 25);
             brick.MoveMotor('B', -25);
-            pause(1.7);
+            pause(1.5);
             brick.MoveMotor('AB', 0);
         end
 
@@ -140,8 +140,8 @@ classdef MazeRunnerFunctions
                         brick.MoveMotor('A', -10);
                         brick.MoveMotor('B', -10);
                     else
-                        brick.MoveMotor('A', -100);
-                        brick.MoveMotor('B', -100);
+                        brick.MoveMotor('A', -50);
+                        brick.MoveMotor('B', -50);
                     end
                     
                     disp('move up');
@@ -151,8 +151,8 @@ classdef MazeRunnerFunctions
                         brick.MoveMotor('A', 10);
                         brick.MoveMotor('B', 10);
                     else
-                        brick.MoveMotor('A', 100);
-                        brick.MoveMotor('B', 100);
+                        brick.MoveMotor('A', 50);
+                        brick.MoveMotor('B', 50);
                     end
                     
                     disp('move down');
@@ -183,7 +183,7 @@ classdef MazeRunnerFunctions
             end
 
 
-            brick.MoveMotor('AB', -100);
+            brick.MoveMotor('AB', -50);
             % disp('In Auto control');
 
 
@@ -196,8 +196,9 @@ classdef MazeRunnerFunctions
 
             if (color == 5)
                 disp('red color detected. stopping car ');
+                brick.MoveMotor('AB', -50);
+                pause(3);                 
                 brick.MoveMotor('AB', 0);
-                pause(1);                        
                 % after stopping at a red line, it should stop here, pause 
                 % for a second and then check left and right and turn 
                 % wherever. the pause value here needs to be tweaked.
@@ -206,7 +207,7 @@ classdef MazeRunnerFunctions
                 whichWayToTurn = MazeRunnerFunctions.CheckLeftAndRight(brick, distanceThreshold, distanceOffset);
                 pause(1);
 
-                fprintf('turn available: %s\n' + whichWayToTurn);
+                fprintf('turn available: %s\n', whichWayToTurn);
                 MazeRunnerFunctions.TurningFunctionality(brick, whichWayToTurn);
 
                 return;
@@ -224,7 +225,7 @@ classdef MazeRunnerFunctions
                 disp('At dropoff point but no passenger. turning around.');
 
                 MazeRunnerFunctions.turnAround(brick);
-                brick.MoveMotor('AB', -100);
+                brick.MoveMotor('AB', -50);
                 pause(0.5); % this value may need tweaking as the car can still be on the drop off color or go too far.
 
                 % get an updated value for color
@@ -261,20 +262,20 @@ classdef MazeRunnerFunctions
                         % if we can turn any way, turn left. we need it to
                         % be left because it helps us is many cases.
                         MazeRunnerFunctions.turnLeft(brick);
-                        brick.MoveMotor('AB', -100); % start moving forward
+                        brick.MoveMotor('AB', -50); % start moving forward
 
 
 
                     case WaysToTurn.Left
                         disp('Left turn available. Turning Left.');
                         MazeRunnerFunctions.turnLeft(brick);
-                        brick.MoveMotor('AB', -100); % start moving forward
+                        brick.MoveMotor('AB', -50); % start moving forward
 
 
                     case WaysToTurn.Right
                         disp('Right turn available. Turning Right.');
                         MazeRunnerFunctions.turnRight(brick);
-                        brick.MoveMotor('AB', -100); % start moving forward
+                        brick.MoveMotor('AB', -50); % start moving forward
 
 
                     case WaysToTurn.None
@@ -285,7 +286,7 @@ classdef MazeRunnerFunctions
                         % MazeRunnerFunctions.turnLeft(brick);
                         
                         MazeRunnerFunctions.turnAround(brick);
-                        brick.MoveMotor('AB', -100); % start moving forward
+                        brick.MoveMotor('AB', -50); % start moving forward
 
             end
         end
@@ -376,7 +377,7 @@ classdef MazeRunnerFunctions
             pause(1);
 
             disp('red color functionality move forward');
-            brick.MoveMotor('AB', -100); % keep moving
+            brick.MoveMotor('AB', -50); % keep moving
             pause(1);
         end
 

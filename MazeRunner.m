@@ -31,14 +31,14 @@ distanceThreshold = 15;
 % if distance is less than this value, then we decide to move left or right
 % in the autoControl function. leave it at 15 unless experimenting.
 
-distanceOffset = 40; % this value should be heavily tested and verified it works.
+distanceOffset = 30; % this value should be heavily tested and verified it works.
 % if there isnt a wall distanceThreshold + distanceOffset cm away, 
 % we know that that turn is also navigable. the offset is here to 
 % resolve the case where it detects a wall but its less than our
 % threshold which needs the car to be very close to the wall.
 % essentially im extending the threshold.
 
-manualControlPointReached = false;
+manualControlPointReached = true;
 
 firstColorDetected = 3; % green
 % this is the starting color
