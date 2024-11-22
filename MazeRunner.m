@@ -38,7 +38,7 @@ distanceOffset = 30; % this value should be heavily tested and verified it works
 % threshold which needs the car to be very close to the wall.
 % essentially im extending the threshold.
 
-manualControlPointReached = true;
+manualControlPointReached = false;
 
 firstColorDetected = 3; % green
 % this is the starting color
