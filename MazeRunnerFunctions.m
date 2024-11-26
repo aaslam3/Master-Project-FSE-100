@@ -10,7 +10,7 @@ classdef MazeRunnerFunctions
 
         function goBack(brick)
             brick.MoveMotor('A', 50);
-         q   brick.MoveMotor('B', 54);
+            brick.MoveMotor('B', 54);
         end
 
         function updateTextBox(textbox, key)
@@ -187,7 +187,7 @@ classdef MazeRunnerFunctions
         function [manualControlPointReachedReturn] = autoControl(brick, distance, color, firstColorDetected, manualControlPoint, targetDropOffColor, distanceThreshold, distanceOffset, passengerPickedUp)
             
             if (color == targetDropOffColor && passengerPickedUp == true)
-                disp('!!! AT DROPOFF POINT WITH PASSENGER !!!    Press q to quit program or move car manually.');
+                disp('!!! AT DROPOFF POINT WITH PASSENGER !!!    Press q to quit program.');
                 pause(0.2);
                 return;
             end
@@ -211,7 +211,7 @@ classdef MazeRunnerFunctions
                 brick.MoveMotor('AB', 0);
                 % after stopping at a red line, it should stop here, pause 
                 % for a second and then check left and right and turn 
-                % wherever. the pause value here needs to be tweaked.
+                % wherever.
 
                 disp('checking left and right');
                 whichWayToTurn = MazeRunnerFunctions.CheckLeftAndRight(brick, distanceThreshold, distanceOffset);
@@ -230,20 +230,63 @@ classdef MazeRunnerFunctions
                 return;
             end
 
+            % 0 == unknown color
+            % 1 == black
+            % 2 == blue
+            % 3 == green
+            % 4 == yellow
+            % 5 == red
+            % 6 == white
+            % 7 == brown
 
-            if (color == targetDropOffColor && passengerPickedUp == false)
-                disp('At dropoff point but no passenger. turning around.');
+            % if color and target drop off point is blue
+            if (color == targetDropOffColor && targetDropOffColor == 2 && passengerPickedUp == false)
 
-                MazeRunnerFunctions.turnAround(brick);
-                MazeRunnerFunctions.goForward(brick);
-                pause(2); % this value may need tweaking as the car can still be on the drop off color or go too far.
+                disp('At dropoff point (blue) but no passenger. ');
+                brick.beep(5, 500);
 
-                % get an updated value for color
-                whichWayToTurn = MazeRunnerFunctions.CheckLeftAndRight(brick, distanceThreshold, distanceOffset);
+                brick.MoveMotor('AB', 0);
+                pause(1);
 
-                MazeRunnerFunctions.TurningFunctionality(brick, whichWayToTurn);
+                brick.MoveMotor('AB', 100); % go back
+                pause(1); % this delay value needs to be tweaked
 
-                return;
+                brick.MoveMotor('AB', 0);
+                MazeRunnerFunctions.turnRight(brick);
+                pause(1); 
+
+                brick.MoveMotor('AB', -100); % go forward
+                pause(2);  % this delay value needs to be tweaked
+
+                if (manualControlPoint == 3) % if customer pickup point is green
+
+                    disp('going left as the customer is on the left');
+                    brick.MoveMotor('AB', 0);
+                    MazeRunnerFunctions.turnLeft(brick);
+                    pause(1);
+
+                    brick.MoveMotor('AB', -100);
+
+                elseif (manualControlPoint == 4) % if customer pickup point is yellow
+
+                    disp('going left as the customer is on the right');
+                    brick.MoveMotor('AB', 0);
+                    MazeRunnerFunctions.turnRight(brick);
+                    pause(1);
+
+                    brick.MoveMotor('AB', -100);
+
+                else
+                    % a situation where neither green nor yellow is the
+                    % customer pickup point. which would leave blue as the
+                    % customer pickup point. this should never happen.
+                    brick.MoveMotor('AB', 0);
+                    for i = 1:50
+                        disp('ENTERED IN A SITUATION WHICH SHOULD NEVER HAPPEN');
+                        disp('CHECK YOUR STARTING VARIABLES');
+                    end
+                    
+                end
             end
 
             
