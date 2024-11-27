@@ -1,1 +1,2 @@
-brick.MoveMotor('AB', 0);
+brick.MoveMotor('ABC', 0);
+fprintf('Battery Level: %d\n', brick.GetBattLevel());

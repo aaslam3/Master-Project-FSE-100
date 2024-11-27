@@ -1,47 +1,49 @@
-
-global key;
-distance = 0;
-color = 0;
-
-
-while true
-    disp('0. Quit');
-    disp('1. Distance');
-    disp('2. Color');
-
-    userChoice = input('Enter a number: ');
-
-    switch userChoice
-        case 0
-            break;
-
-        case 1
-            disp('Distance test chosen.');
-
-            while true
-                % distance = brick.UltrasonicDist(2);
-                fprintf('Distance: %.f\n', distance);
-
-                pause(0.1);
-            end
-
-        case 2
-            disp('Color test chosen.');
-
-            while true
-                % color = brick.ColorCode(1);
-                fprintf('Color : %.f\n', color);
-                set(textbox, 'String', key);
-
-                pause(0.1);
-            end
-
-        otherwise
-
-    end
-
-    disp('Reprompting user...');
-    % because the user entered a wrong number
-
-    pause(0.1);
+function turnRight(brick)
+    disp('turning right');
+    brick.MoveMotor('A', -28);
+    pause(2.35);
+    brick.MoveMotor('AB', 0);
 end
+
+turnRight(brick);
+
+
+
+
+% disp('starting...');
+% brick.MoveMotorAngleRel('A', -50, 450);
+% disp('moving');
+% brick.WaitForMotor('AB');
+% disp('waiting...');
+% brick.MoveMotor('A', 0);
+% disp('stopped');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% 
+% 
+% function turnRight(brick)
+%     disp('turning right');
+%     brick.MoveMotor('A', -26);
+%     pause(2.4);
+%     brick.MoveMotor('AB', 0);
+% end
+% 
+% turnRight(brick);
