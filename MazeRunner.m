@@ -10,8 +10,7 @@ pause(0.05);
 
 color = 0;
 
-% brick.SetColorMode(3, 2);
-% brick.SetColorMode(1, 2); % this is just here to enable the second color sensor which does nothing
+% brick.SetColorMode(1, 2);
 
 
 % if distance is less than this value, then we decide to move left or right
