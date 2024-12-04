@@ -145,7 +145,7 @@ while true
             return;
         end
 
-        StoqpForColorsAndBeep(brick, color, firstColorDetected);
+        StopForColorsAndBeep(brick, color, firstColorDetected);
 
         if (color == 2 && manualControlPoint ~= 2)
             disp('Blue detected. Turning around...')
@@ -276,7 +276,7 @@ function FixDistanceToWall(brick, distance, distanceThreshold)
     
     pause(0.2);
     GoForward(brick);
-    % pause(0.4);q
+    % pause(0.4);
 
 end
 
