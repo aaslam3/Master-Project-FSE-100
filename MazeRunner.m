@@ -10,7 +10,7 @@ pause(0.05);
 
 color = 0;
 
-brick.SetColorMode(1, 2);
+% brick.SetColorMode(1, 2);
 
 % if distance is less than this value, then we decide to move left or right
 % in the autoControl function. leave it at 15 unless experimenting.
@@ -25,7 +25,7 @@ distanceThreshold = 20;
 distanceOffset = 25;
 
 % this is the starting color
-firstColorDetected = 3;
+firstColorDetected = 4;
 
 % should be changed for what is given by the prof. 
 % this is the color where we switch to manual control
@@ -33,7 +33,7 @@ manualControlPoint = 2;
 
 % should be changed for what is given by the prof. 
 % this is the color we have to reach after turning off manual control
-targetDropOffColor = 4;
+targetDropOffColor = 3;
 
 % this is a flag to check if we passed picked up the passenger. useful for 
 % if we reach the drop off point without picking up passenger.
@@ -81,6 +81,10 @@ while true
 
         switch key
 
+            case 'o'
+                bManualControlPointReached = false;
+                disp('Drop off point reached false OOOO shit');
+
             case 'p' % resume auto mode
                 bManualControlPointReached = false;
                 passengerPickedUp = true;
@@ -108,13 +112,13 @@ while true
                 disp('move right');
 
             case 'uparrow'
-                brick.MoveMotor('A', -20);
-                brick.MoveMotor('B', -25);
+                brick.MoveMotor('A', -30);
+                brick.MoveMotor('B', -35);
                 disp('move up');
 
             case 'downarrow'
-                brick.MoveMotor('A', 20);
-                brick.MoveMotor('B', 25);
+                brick.MoveMotor('A', 30);
+                brick.MoveMotor('B', 35);
                 brick.beep(1, 700); 
                 % to simulate a vehicle backing up which creates a beeping 
                 % noise. just for cosmetic effect
@@ -135,13 +139,13 @@ while true
             pause(1);
             Stop(brick);
 
-            AtDropOffPointWork(brick);
+            % AtDropOffPointWork(brick);
 
             disp('Exiting...')
             return;
         end
 
-        StopForColorsAndBeep(brick, color, firstColorDetected);
+        StoqpForColorsAndBeep(brick, color, firstColorDetected);
 
         if (color == 2 && manualControlPoint ~= 2)
             disp('Blue detected. Turning around...')
@@ -167,11 +171,11 @@ while true
             Stop(brick);
 
             % beeps five times (or maybe 6 not sure)
-            for i = 1 : 5
-                fprintf('beep %d', i + 1);
-                brick.beep(1, 200);
-                pause(0.6);
-            end
+            % for i = 1 : 5
+            %     fprintf('beep %d', i + 1);
+            %     brick.beep(5, 200);
+            %     pause(0.6);
+            % end
 
             continue;
         end
@@ -199,7 +203,7 @@ while true
             disp('turning left');
             TurnLeft(brick);
             GoForward(brick);
-            pause(2);
+            pause(1);
 
             continue;
         end
@@ -272,7 +276,7 @@ function FixDistanceToWall(brick, distance, distanceThreshold)
     
     pause(0.2);
     GoForward(brick);
-    pause(0.4);
+    % pause(0.4);q
 
 end
 
