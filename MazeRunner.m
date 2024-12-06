@@ -139,7 +139,7 @@ while true
             pause(1);
             Stop(brick);
 
-            % AtDropOffPointWork(brick);
+            
 
             disp('Exiting...')
             return;
@@ -159,10 +159,7 @@ while true
             pause(1);
         end
 
-        % if color detected is red
-        % if (color == 5)
-            % CheckLeftAndRight(brick, distance, distanceThreshold, distanceOffset);
-        % end
+        
 
         % if at manual control point, set variable to true and return function
         if (color == manualControlPoint)
@@ -170,12 +167,7 @@ while true
             disp('Drop off point reached. Moving to manual control');
             Stop(brick);
 
-            % beeps five times (or maybe 6 not sure)
-            % for i = 1 : 5
-            %     fprintf('beep %d', i + 1);
-            %     brick.beep(5, 200);
-            %     pause(0.6);
-            % end
+           
 
             continue;
         end
