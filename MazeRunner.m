@@ -83,7 +83,7 @@ while true
 
             case 'o'
                 bManualControlPointReached = false;
-                disp('Drop off point reached false OOOO shit');
+                disp('Drop off point reached false');
 
             case 'p' % resume auto mode
                 bManualControlPointReached = false;
